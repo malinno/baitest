@@ -65,7 +65,8 @@ function Gener() {
               onChange={(e) => setNewAssumption(e.target.value)}
               placeholder=""
             />
-            <Button onClick={handleAddAssumption} type="primary" className='bg-lime-500' block icon={<PlusCircleOutlined/>} />
+            <Button onClick={handleAddAssumption} type="primary" className='bg-lime-500' block 
+            icon={<PlusCircleOutlined/>} />
           </div>
           {assumptions.map((assumption, index) => (
             <div key={index} className="flex items-center">

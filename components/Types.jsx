@@ -1,33 +1,16 @@
 'use client'
-import { Button, Card, Modal, Form, Input } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Input, Modal } from 'antd';
 import React, { useState } from 'react';
-import { Cascader } from 'antd';
 
 function Types() {
-  const onChange = (value) => {
-    console.log(value);
-  };
   const { TextArea } = Input;
-  const options = [
-    {
-      value: 'String',
-      label: 'String',
-    },
-    {
-      value: 'number',
-      label: 'number',
-    },
-    {
-      value: 'boolean',
-      label: 'boolean',
-    },
-  ];
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddDefinitionModalOpen, setIsAddDefinitionModalOpen] = useState(false);
-  const [typeId, setTypeId] = useState('');
-  const [description, setDescription] = useState('');
-  const [definitionName, setDefinitionName] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [textareaValue, setTextareaValue] = useState('');
+  const [showValue, setShowValue] = useState(false);
+  const [dataList, setDataList] = useState([]);
+
+  const [selectedData, setSelectedData] = useState(null); // Dữ liệu được chọn để chỉnh sửa
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -35,89 +18,81 @@ function Types() {
 
   const handleOk = () => {
     setIsModalOpen(false);
-    // Xử lý logic khi bấm OK trong modal
+    if (inputValue || textareaValue) {
+      if (selectedData) {
+        // Chỉnh sửa dữ liệu đã chọn
+        const updatedDataList = dataList.map((data) =>
+          data === selectedData ? { ...data, input: inputValue, textarea: textareaValue } : data
+        );
+        setDataList(updatedDataList);
+        setSelectedData(null);
+      } else {
+        // Thêm dữ liệu mới
+        const newData = { input: inputValue, textarea: textareaValue };
+        setDataList([...dataList, newData]);
+      }
+      setInputValue('');
+      setTextareaValue('');
+      setShowValue(true);
+    }
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setInputValue('');
+    setTextareaValue('');
+    setSelectedData(null);
   };
 
-  const showAddDefinitionModal = () => {
-    setIsAddDefinitionModalOpen(true);
+  const handleEdit = (data) => {
+    setIsModalOpen(true);
+    setSelectedData(data);
+    setInputValue(data.input);
+    setTextareaValue(data.textarea);
   };
 
-  const handleAddDefinitionOk = () => {
-    setIsAddDefinitionModalOpen(false);
-    // Xử lý logic khi bấm OK trong modal "Add New definition"
-  };
-
-  const handleAddDefinitionCancel = () => {
-    setIsAddDefinitionModalOpen(false);
-  };
-
-  const handleTypeInputChange = (e) => {
-    setTypeId(e.target.value);
-  };
-
-  const handleDescriptionInputChange = (e) => {
-    setDescription(e.target.value);
-  };
-
-  const handleDefinitionNameInputChange = (e) => {
-    setDefinitionName(e.target.value);
+  const handleDelete = (data) => {
+    const updatedDataList = dataList.filter((item) => item !== data);
+    setDataList(updatedDataList);
+    if (selectedData === data) {
+      setInputValue('');
+      setTextareaValue('');
+      setSelectedData(null);
+    }
   };
 
   return (
     <div>
-     <Card title="Quest Types" className="w-80 h-screen">
-  <Button type="primary" block onClick={showModal}>
-    <PlusCircleOutlined className="mr-3" />
-    <span className="text">Add New Quest Type</span>
-  </Button>
-</Card>
-
-      <Modal
-        title="Add New Quest Type"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-      <Form.Item
-  label="Type ID"
-  name="questTypeName"
-  rules={[{ required: true, message: 'Vui lòng Nhập Thông Tin !' }]}
->
-  <Input value={typeId} onChange={e => setTypeId(e.target.value)} />
-</Form.Item>
-
-<Form.Item
-  label="Description"
-  name="description"
-  rules={[{ required: true, message: 'Vui lòng Nhập Thông Tin !' }]}
->
-  <TextArea value={description} onChange={e => setDescription(e.target.value)} />
-</Form.Item>
-
-      </Modal>
-
-      <Modal
-        title="Add New Definition"
-        open={isAddDefinitionModalOpen}
-        onOk={handleAddDefinitionOk}
-        onCancel={handleAddDefinitionCancel}
-      >
-      <Form.Item
-  label="Definition Name"
-  name="definitionName"
-  rules={[{ required: true, message: 'Vui lòng Nhập Thông Tin !' }]}
->
-  <TextArea value={definitionName} onChange={e => setDefinitionName(e.target.value)} />
-</Form.Item>
-
-      </Modal>
+      <Card title="Quest Types" className="w-80 h-screen">
+        <Button type="primary" className="bg-lime-700" onClick={showModal}>
+          Add New Quest Type
+        </Button>
+        {showValue ? (
+          <div>
+            {dataList.map((data, index) => (
+              <div key={index}>
+                <p className='text-2xl font-semibold'>Quest type:{data.input}</p>
+                <p className='text-lg'>{data.textarea}</p>
+                <Button type="primary" className='bg-amber-400 mx-2' onClick={() => handleEdit(data)}>
+                  <span className='text-blue-600/100'>Edit Quest </span>
+                </Button>
+                <Button type="primary" className='bg-red-700' danger onClick={() => handleDelete(data)}>
+                 <span className='text-blue-600/100'>Delete Quest </span> 
+                </Button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        <Modal title="Basic Modal" visible={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+          <Input onChange={(e) => setInputValue(e.target.value)} value={inputValue} />
+          <TextArea onChange={(e) => setTextareaValue(e.target.value)} value={textareaValue} className="my-3" />
+        </Modal>
+      </Card>
     </div>
   );
 }
 
 export default Types;
+
+
 

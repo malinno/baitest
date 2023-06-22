@@ -1,6 +1,6 @@
 'use client'
 import { Button, Card, Input, Modal } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function Types() {
   const { TextArea } = Input;
@@ -11,6 +11,20 @@ function Types() {
   const [dataList, setDataList] = useState([]);
 
   const [selectedData, setSelectedData] = useState(null); // Dữ liệu được chọn để chỉnh sửa
+
+  useEffect(() => {
+    // Lấy dữ liệu từ localStorage khi component được khởi tạo
+    const savedDataList = localStorage.getItem('dataList');
+    if (savedDataList) {
+      setDataList(JSON.parse(savedDataList));
+      setShowValue(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Lưu dữ liệu vào localStorage khi có thay đổi
+    localStorage.setItem('dataList', JSON.stringify(dataList));
+  }, [dataList]);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -93,6 +107,7 @@ function Types() {
 }
 
 export default Types;
+
 
 
 
